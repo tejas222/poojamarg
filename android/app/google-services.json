@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "733586059146",
+    "project_id": "pojaamarg-otp",
+    "storage_bucket": "pojaamarg-otp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:733586059146:android:0f25d9e1221b53982da273",
+        "android_client_info": {
+          "package_name": "com.poojamarg"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDap3yAUr3ZWF5zfOGSYDMf1g54YShu-9k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
