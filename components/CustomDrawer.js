@@ -10,7 +10,7 @@ import auth from '@react-native-firebase/auth';
 
 const CustomDrawer = props => {
   const { user, setUser } = useUser();
-  console.log('user', user);
+
   const handleLogout = async () => {
     try {
       await auth().signOut();
@@ -25,7 +25,7 @@ const CustomDrawer = props => {
     <DrawerContentScrollView {...props}>
       <View style={styles.profileSection}>
         <Image
-          source={require('../assets/icon.png')} // 👈 replace with your image
+          source={require('../assets/logo.png')} // 👈 replace with your image
           style={styles.profileImage}
         />
         {user ? (
@@ -41,7 +41,7 @@ const CustomDrawer = props => {
             <Text style={styles.action}>Logout</Text>
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity onPress={() => props.navigation.navigate('Login')}>
+          <TouchableOpacity onPress={() => props.navigation.replace('Login')}>
             <Text style={styles.action}>Login</Text>
           </TouchableOpacity>
         )}
@@ -60,9 +60,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   profileImage: {
-    width: 80,
+    width: '100%',
     height: 80,
-    borderRadius: 40,
+    resizeMode: 'contain',
     marginBottom: 10,
   },
   userName: {

@@ -11,8 +11,8 @@ import { background, primary } from '../utils/constants';
 import firestore from '@react-native-firebase/firestore';
 import DatePicker from 'react-native-date-picker';
 
-const ProfileScreen = ({ user, navigation }) => {
-  const { uid, phoneNumber } = user;
+const ProfileScreen = ({ route, navigation }) => {
+  const { uid, phoneNumber } = route.params;
   const [name, setName] = useState('');
   const [date, setDate] = useState(new Date());
   const [open, setOpen] = useState(false);

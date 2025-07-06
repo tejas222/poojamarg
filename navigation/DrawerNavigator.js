@@ -13,6 +13,7 @@ import { useUser } from '../context/UserContext';
 import auth from '@react-native-firebase/auth';
 import UpdateProfileScreen from '../adminComponents/UpdateProfileScreen';
 import Dashboard from '../adminComponents/Dashboard';
+import MyBookings from '../screens/MyBookings';
 
 const Drawer = createDrawerNavigator();
 
@@ -54,7 +55,12 @@ export default function DrawerNavigator() {
           drawerLabel: 'Home',
         }}
       />
-      <Drawer.Screen name="Dashboard" component={Dashboard} />
+      {user.role === 'admin' ? (
+        <Drawer.Screen name="Dashboard" component={Dashboard} />
+      ) : (
+        <Drawer.Screen name="My Bookings" component={MyBookings} />
+      )}
+
       {user?.uid && (
         <Drawer.Screen name="MyProfile" options={{ drawerLabel: 'My Profile' }}>
           {props => <UpdateProfileScreen {...props} user={user} />}

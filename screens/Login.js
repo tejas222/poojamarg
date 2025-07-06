@@ -7,72 +7,160 @@ import {
   Alert,
   ActivityIndicator,
   StyleSheet,
+  Platform, // Don't forget to import Platform for consistency
 } from 'react-native';
-import auth from '@react-native-firebase/auth';
+// Import specific methods from @react-native-firebase/auth
+import {
+  getAuth,
+  signInWithPhoneNumber,
+  onAuthStateChanged,
+} from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { background, primary } from '../utils/constants';
 import { useUser } from '../context/UserContext';
+import { useEffect } from 'react'; // Import useEffect for the auth state listener
 
 const Login = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [code, setCode] = useState('');
-  const [confirm, setConfirm] = useState(null);
+  const [confirm, setConfirm] = useState(null); // Firebase phone auth confirmation object
   const [loading, setLoading] = useState(false);
   const { setUser } = useUser();
 
+  // Initialize Firebase Auth instance
+  const authInstance = getAuth();
+
+  // Listen for authentication state changes, primarily for auto-verification on Android
+  useEffect(() => {
+    const subscriber = onAuthStateChanged(authInstance, user => {
+      if (user) {
+        console.log('Firebase Auth State Changed:', user.uid);
+        handleUserLoginSuccess(user); // Centralize success handling
+      } else {
+        console.log('Firebase Auth State Changed: No user');
+      }
+    });
+
+    return subscriber; // Unsubscribe on unmount
+  }, [authInstance]); // Dependency on authInstance to ensure listener is correctly setup
+
+  // Centralized success handler for user login (OTP or Google)
+  const handleUserLoginSuccess = async user => {
+    setLoading(true);
+
+    try {
+      const userRef = firestore().collection('users').doc(user.uid);
+      const userDocument = await userRef.get();
+
+      if (userDocument.exists()) {
+        const userData = userDocument.data();
+        setUser({ uid: user.uid, ...userData });
+
+        console.log('User exists, navigating to Drawer');
+        navigation.replace('Drawer');
+      } else {
+        // This is a new user
+        console.log('New user detected, navigating to Profile');
+        setUser({ uid: user.uid, phoneNumber: user.phoneNumber }); // Ensure context is set
+        navigation.replace('Profile', {
+          uid: user.uid,
+          phoneNumber: user.phoneNumber,
+        });
+      }
+    } catch (firestoreError) {
+      console.error('Firestore fetch error:', firestoreError);
+      Alert.alert(
+        'Login Error',
+        'Something went wrong while checking your user data. Try again.',
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const sendOTP = async () => {
+    // Basic phone number format validation
+    if (!phoneNumber || phoneNumber.length < 10) {
+      // Simple length check
+      Alert.alert('Error', 'Please enter a valid phone number.');
+      return;
+    }
     if (!phoneNumber.startsWith('+')) {
-      Alert.alert('Error', 'Please include country code (e.g., +91)');
+      Alert.alert('Error', 'Please include country code (e.g., +91).');
       return;
     }
 
     setLoading(true);
     try {
-      const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+      // Use signInWithPhoneNumber from @react-native-firebase/auth
+      const confirmation = await signInWithPhoneNumber(
+        authInstance,
+        phoneNumber,
+      );
       setConfirm(confirmation);
-      Alert.alert('OTP sent', 'Check your SMS inbox');
+      Alert.alert('OTP Sent', 'Check your SMS inbox for the 6-digit code.');
     } catch (error) {
-      console.log(error);
-      Alert.alert('Error', 'Failed to send OTP');
+      console.error('Error sending OTP:', error);
+      let errorMessage = 'Failed to send OTP.';
+      if (error.code === 'auth/too-many-requests') {
+        errorMessage = 'Too many requests. Please try again later.';
+      } else if (error.code === 'auth/invalid-phone-number') {
+        errorMessage = 'The phone number format is invalid.';
+      }
+      Alert.alert('Error', errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   const confirmOTP = async () => {
-    if (!confirm) return;
+    if (!confirm || !code) {
+      Alert.alert('Error', 'Please enter the OTP.');
+      return;
+    }
+    if (code.length !== 6) {
+      // Basic OTP length validation
+      Alert.alert('Error', 'OTP must be 6 digits long.');
+      return;
+    }
 
     setLoading(true);
     try {
+      // Use confirm.confirm() on the confirmation object
       const userCredential = await confirm.confirm(code);
       const user = userCredential.user;
-      const userRef = firestore().collection('users').doc(user.uid);
-      const userDocument = await userRef.get();
 
-      // The key change is here: using userDocument.exists() as a function call
-      const docExists = userDocument.exists();
-      if (docExists) {
-        const userData = userDocument.data();
-        setUser({ uid: user.uid, ...userData });
-        navigation.replace('Drawer');
-      } else {
-        navigation.replace('Profile', {
-          uid: user.uid,
-          phoneNumber: user.phoneNumber,
-        });
-      }
+      // The onAuthStateChanged listener will now handle navigating and setting user context
+      // You can remove the direct call to handleUserLoginSuccess here if you rely purely on the listener
+      // However, if there are issues with listener timing or direct navigation is preferred,
+      // keeping it here also works, but ensure `setLoading(false)` is only called once.
+      // For a clear flow, I've moved the user data fetch and navigation into handleUserLoginSuccess
+      // which is called by the `onAuthStateChanged` listener.
+      // This ensures a consistent flow regardless of auto-verification or manual OTP entry.
+
+      console.log(
+        'OTP confirmed successfully, waiting for auth state listener.',
+      );
+      // The `onAuthStateChanged` listener will trigger and call `handleUserLoginSuccess(user)`
+      // setLoading(false) is handled in handleUserLoginSuccess
     } catch (error) {
-      console.log('Error during OTP confirmation:', error);
-      Alert.alert('Invalid Code', 'Please enter the correct OTP');
-    } finally {
-      setLoading(false);
+      console.error('Error during OTP confirmation:', error);
+      let errorMessage = 'Please enter the correct OTP.';
+      if (error.code === 'auth/invalid-verification-code') {
+        errorMessage = 'The verification code is invalid.';
+      } else if (error.code === 'auth/code-expired') {
+        errorMessage = 'The verification code has expired.';
+      }
+      Alert.alert('Invalid Code', errorMessage);
+      setLoading(false); // Make sure to stop loading on error here
     }
   };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login with Phone</Text>
 
-      {!confirm ? (
+      {!confirm ? ( // If confirmation object is null, show phone input
         <>
           <Text style={styles.label}>Phone Number</Text>
           <TextInput
@@ -81,6 +169,7 @@ const Login = ({ navigation }) => {
             keyboardType="phone-pad"
             value={phoneNumber}
             onChangeText={setPhoneNumber}
+            editable={!loading} // Disable input when loading
           />
           <TouchableOpacity
             style={styles.button}
@@ -95,6 +184,7 @@ const Login = ({ navigation }) => {
           </TouchableOpacity>
         </>
       ) : (
+        // If confirmation object exists, show OTP input
         <>
           <Text style={styles.label}>Enter OTP</Text>
           <TextInput
@@ -104,6 +194,7 @@ const Login = ({ navigation }) => {
             maxLength={6}
             value={code}
             onChangeText={setCode}
+            editable={!loading} // Disable input when loading
           />
           <TouchableOpacity
             style={styles.button}

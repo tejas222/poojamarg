@@ -97,9 +97,9 @@ android {
         }
         release {
             storeFile file("release-key.jks")
-            storePassword "teja@7875"
+            storePassword 'android'
             keyAlias "release-key"
-            keyPassword "tejas@7875"
+            keyPassword 'android'
         }
     }
     buildTypes {

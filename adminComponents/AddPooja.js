@@ -50,8 +50,7 @@ const AddPooja = () => {
       setImage(asset);
     });
   };
-  console.log('Selected Category:', selectedCategory);
-  console.log('Available Items:', items);
+
   const uploadToCloudinary = async () => {
     if (!image?.uri) {
       Alert.alert('Error', 'Please select an image first.');

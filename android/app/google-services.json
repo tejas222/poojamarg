@@ -12,7 +12,20 @@
           "package_name": "com.poojamarg"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "733586059146-smem04aqabi9o5hlaujkbjvnjod79tb1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.poojamarg",
+            "certificate_hash": "46fac66a002c8da7b76016b6613663407ce56a91"
+          }
+        },
+        {
+          "client_id": "733586059146-mmeraoqjngqon1afubqf4ip6min3o6q1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDap3yAUr3ZWF5zfOGSYDMf1g54YShu-9k"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "733586059146-mmeraoqjngqon1afubqf4ip6min3o6q1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

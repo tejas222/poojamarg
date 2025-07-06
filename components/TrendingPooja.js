@@ -1,4 +1,5 @@
 import {
+  FlatList,
   Image,
   ScrollView,
   StyleSheet,
@@ -9,65 +10,41 @@ import {
 import React from 'react';
 import { secondary } from '../utils/constants';
 import { useNavigation } from '@react-navigation/native';
+import { useUser } from '../context/UserContext';
 
 const TrendingPooja = () => {
   const navigation = useNavigation();
-  return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-      <View style={styles.container}>
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('SinglePooja', {
-              title: 'नवग्रह शांती हवन',
-            })
-          }
-        >
-          <View style={styles.tileContainer}>
-            <Image
-              source={require('../assets/navgrahashanti.jpg')}
-              style={styles.image}
-            />
-            <View style={styles.textContainer}>
-              <Text style={styles.title}>नवग्रह शांती हवन </Text>
-              <Text style={styles.price}>रु ५००१</Text>
-            </View>
-          </View>
-        </TouchableOpacity>
+  const { pooja } = useUser();
 
-        <View style={styles.tileContainer}>
-          <Image
-            source={require('../assets/vastushanti.jpeg')}
-            style={styles.image}
-          />
-          <View style={styles.textContainer}>
-            <Text style={styles.title}>वास्तुशांति</Text>
-            <Text style={styles.price}>रु ५००१</Text>
-          </View>
-        </View>
-
-        <View style={styles.tileContainer}>
-          <Image
-            source={require('../assets/satyanarayan.webp')}
-            style={styles.image}
-          />
-          <View style={styles.textContainer}>
-            <Text style={styles.title}>सत्यनारायण पुजा</Text>
-            <Text style={styles.price}>रु ५००१</Text>
-          </View>
-        </View>
-
-        <View style={styles.tileContainer}>
-          <Image
-            source={require('../assets/udak_shanti.jpg')}
-            style={styles.image}
-          />
-          <View style={styles.textContainer}>
-            <Text style={styles.title}>उदक शांती </Text>
-            <Text style={styles.price}>रु ५००१</Text>
-          </View>
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      onPress={() =>
+        navigation.navigate('SinglePooja', {
+          pooja: item,
+        })
+      }
+    >
+      <View style={styles.tileContainer}>
+        <Image
+          source={require('../assets/navgrahashanti.jpg')}
+          style={styles.image}
+        />
+        <View style={styles.textContainer}>
+          <Text style={styles.title}>{item.title} </Text>
+          <Text style={styles.price}>रु {item.price}</Text>
         </View>
       </View>
-    </ScrollView>
+    </TouchableOpacity>
+  );
+  return (
+    <FlatList
+      data={pooja}
+      horizontal
+      renderItem={renderItem}
+      keyExtractor={item => item.id}
+      contentContainerStyle={styles.list}
+      showsHorizontalScrollIndicator={false}
+    />
   );
 };
 
@@ -80,11 +57,14 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
   },
+
   tileContainer: {
     backgroundColor: '#fff',
     borderRadius: 20,
     padding: 10,
     alignItems: 'center',
+    gap: 10,
+    marginHorizontal: 10,
   },
   image: {
     width: 250,

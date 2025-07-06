@@ -10,13 +10,29 @@ import {
 import React from 'react';
 import { useLayoutEffect } from 'react';
 import { background, primary, success } from '../utils/constants';
+import { useNavigation } from '@react-navigation/native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useUser } from '../context/UserContext';
 
 const SinglePoojaScreen = ({ route, navigation }) => {
+  const navigations = useNavigation();
+  const { user } = useUser();
   const { pooja } = route.params;
-  console.log('item', pooja);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       title: pooja.title,
+      headerRight: () =>
+        user?.role === 'admin' ? (
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('EditPooja', { pooja });
+            }}
+            style={{ marginRight: 15 }}
+          >
+            <MaterialCommunityIcons name="pencil" color={primary} size={35} />
+          </TouchableOpacity>
+        ) : null,
     });
   }, [navigation, pooja.title]);
 
@@ -42,7 +58,10 @@ const SinglePoojaScreen = ({ route, navigation }) => {
         </View>
       </ScrollView>
       <View>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigations.navigate('BookPooja')}
+        >
           <Text style={styles.buttonText}>Book Now</Text>
         </TouchableOpacity>
       </View>
