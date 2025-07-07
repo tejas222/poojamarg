@@ -15,83 +15,117 @@ export const UserProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [allPoojaBookings, setAllPoojaBookings] = useState([]);
   const [allMuhurtBookings, setAllMuhurtBookings] = useState([]);
+  const [allKundaliBookings, setAllKundaliBookings] = useState([]);
 
   useEffect(() => {
     const unsubscribers = [];
 
     const unsubscribeAuth = auth().onAuthStateChanged(u => {
       setUser(u);
-      if (u) {
-        const unsubUserPooja = firestore()
-          .collection('poojaBookings')
-          .where('userId', '==', u.uid)
-          .orderBy('createdAt', 'desc')
-          .onSnapshot(snapshot => {
+
+      // Clear state on logout
+      if (!u) {
+        setUserBookings([]);
+        setMuhurtRequest([]);
+        setLoading(false);
+        return;
+      }
+
+      // 🔁 User-specific pooja bookings
+      const unsubUserPooja = firestore()
+        .collection('poojaBookings')
+        .where('userId', '==', u.uid)
+        .orderBy('createdAt', 'desc')
+        .onSnapshot(snapshot => {
+          if (snapshot?.docs) {
             const data = snapshot.docs.map(doc => ({
               id: doc.id,
               ...doc.data(),
             }));
             setUserBookings(data);
             setLoading(false);
-          });
-        unsubscribers.push(unsubUserPooja);
+          }
+        });
+      unsubscribers.push(unsubUserPooja);
 
-        const unsubUserMuhurt = firestore()
-          .collection('muhurtRequests')
-          .where('userId', '==', u.uid)
-          .orderBy('createdAt', 'desc')
-          .onSnapshot(snapshot => {
+      // 🔁 User-specific muhurt requests
+      const unsubUserMuhurt = firestore()
+        .collection('muhurtRequests')
+        .where('userId', '==', u.uid)
+        .orderBy('createdAt', 'desc')
+        .onSnapshot(snapshot => {
+          if (snapshot?.docs) {
             const data = snapshot.docs.map(doc => ({
               id: doc.id,
               ...doc.data(),
             }));
             setMuhurtRequest(data);
             setLoading(false);
-          });
-        unsubscribers.push(unsubUserMuhurt);
-      } else {
-        setUserBookings([]);
-        setMuhurtRequest([]);
-        setLoading(false);
-      }
+          }
+        });
+      unsubscribers.push(unsubUserMuhurt);
     });
 
+    // 🔁 Categories
     const unsubCategories = firestore()
       .collection('categories')
       .orderBy('createdAt', 'desc')
       .onSnapshot(snapshot => {
-        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setCategories(data);
-        setLoadingCategories(false);
+        if (snapshot?.docs) {
+          const data = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setCategories(data);
+          setLoadingCategories(false);
+        }
       });
     unsubscribers.push(unsubCategories);
 
+    // 🔁 All Poojas
     const unsubPooja = firestore()
       .collection('pooja')
       .orderBy('createdAt', 'desc')
       .onSnapshot(snapshot => {
-        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setPooja(data);
-        setLoadingCategories(false);
+        if (snapshot?.docs) {
+          const data = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setPooja(data);
+          setLoadingCategories(false);
+        }
       });
     unsubscribers.push(unsubPooja);
 
+    // 🔁 Price list
     const unsubPrice = firestore()
       .collection('priceList')
       .onSnapshot(snapshot => {
-        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setPoojaPrice(data[0] || {});
-        setLoading(false);
+        if (snapshot?.docs) {
+          const data = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setPoojaPrice(data[0] || {});
+          setLoading(false);
+        }
       });
     unsubscribers.push(unsubPrice);
 
+    // 🔁 All bookings (admin)
     const unsubAllPoojaBookings = firestore()
       .collection('poojaBookings')
       .orderBy('createdAt', 'desc')
       .onSnapshot(snapshot => {
-        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setAllPoojaBookings(data);
-        setLoading(false);
+        if (snapshot?.docs) {
+          const data = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setAllPoojaBookings(data);
+          setLoading(false);
+        }
       });
     unsubscribers.push(unsubAllPoojaBookings);
 
@@ -99,13 +133,33 @@ export const UserProvider = ({ children }) => {
       .collection('muhurtRequests')
       .orderBy('createdAt', 'desc')
       .onSnapshot(snapshot => {
-        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setAllMuhurtBookings(data);
-        setLoading(false);
+        if (snapshot?.docs) {
+          const data = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setAllMuhurtBookings(data);
+          setLoading(false);
+        }
       });
     unsubscribers.push(unsubAllMuhurt);
 
-    // Cleanup all listeners on unmount
+    const unsubAllKundali = firestore()
+      .collection('kundali')
+      .orderBy('createdAt', 'desc')
+      .onSnapshot(snapshot => {
+        if (snapshot?.docs) {
+          const data = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setAllKundaliBookings(data);
+          setLoading(false);
+        }
+      });
+    unsubscribers.push(unsubAllKundali);
+
+    // Cleanup on unmount
     return () => {
       unsubscribeAuth();
       unsubscribers.forEach(unsub => unsub());
@@ -119,18 +173,19 @@ export const UserProvider = ({ children }) => {
         setUser,
         categories,
         loadingCategories,
-        refreshCategories: () => {}, // no-op, realtime now
+        refreshCategories: () => {},
         pooja,
         userBookings,
         loading,
-        refreshBookings: () => {}, // no-op, realtime now
+        refreshBookings: () => {},
         poojaPrice,
         muhurtRequest,
-        refreshMuhurtRequest: () => {}, // no-op, realtime now
+        refreshMuhurtRequest: () => {},
         allPoojaBookings,
         allMuhurtBookings,
         refreshAllPoojaBookings: () => {},
         refreshAllMuhurtRequest: () => {},
+        allKundaliBookings,
       }}
     >
       {children}

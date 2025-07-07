@@ -20,10 +20,15 @@ const AllBookings = () => {
     allMuhurtBookings,
     refreshAllPoojaBookings,
     refreshAllMuhurtRequest,
+    allKundaliBookings,
   } = useUser();
   const [isLoading, setIsLoading] = useState(true);
 
-  const allBookings = [...allPoojaBookings, ...allMuhurtBookings];
+  const allBookings = [
+    ...allPoojaBookings,
+    ...allMuhurtBookings,
+    ...allKundaliBookings,
+  ];
 
   useEffect(() => {
     refreshAllPoojaBookings();
@@ -37,20 +42,36 @@ const AllBookings = () => {
 
   const handlePress = id => {
     const selectedBooking = allBookings.find(pid => pid.id == id);
+    const bookingType = getBookingType(selectedBooking);
+    console.log('bookingType', bookingType);
+    navigation.navigate('SingleBooking', {
+      selectedBooking: selectedBooking,
+      bookingType,
+    });
+  };
 
-    navigation.navigate('SingleBooking', { selectedBooking: selectedBooking });
+  const getBookingType = item => {
+    if (item.poojaName) return 'pooja';
+    if (item.muhurtName) return 'muhurt';
+    return 'kundali';
   };
 
   const renderItem = ({ item }) => (
     <TouchableOpacity onPress={() => handlePress(item.id)}>
       <View style={styles.bookingContainer}>
         <View>
-          <Text style={styles.title}>{item.poojaName || item.muhurtName}</Text>
+          <Text style={styles.title}>
+            {item.poojaName || item.muhurtName || item.type}
+          </Text>
           <Text style={styles.text}>{item.poojaDate || item.month}</Text>
         </View>
         <View>
           <Text style={{ color: success, fontWeight: '500' }}>
-            {item.poojaName ? 'Pooja Booking' : 'Muhurt Request'}
+            {item.poojaName
+              ? 'Pooja Booking'
+              : item.muhurtName
+              ? 'Muhurt Request'
+              : 'Kundali Request'}
           </Text>
           {item.reply && (
             <Text style={{ color: secondary, fontWeight: '500' }}>

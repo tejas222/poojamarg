@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import React from 'react';
-import { secondary } from '../utils/constants';
+import { secondary, success } from '../utils/constants';
 import { useNavigation } from '@react-navigation/native';
 import { useUser } from '../context/UserContext';
 
@@ -73,15 +73,18 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   textContainer: {
-    paddingTop: 10,
+    paddingTop: 5,
     alignItems: 'center',
+    gap: 5,
   },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 700,
     color: secondary,
   },
   price: {
-    fontSize: 20,
+    fontSize: 18,
+    color: success,
+    fontWeight: 500,
   },
 });

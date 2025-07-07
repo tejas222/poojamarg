@@ -20,6 +20,9 @@ import BookPooja from '../screens/BookPooja';
 import MyBookings from '../screens/MyBookings';
 import AllBookings from '../adminComponents/AllBookings';
 import EditPooja from '../adminComponents/EditPooja';
+import Kundali from '../screens/Kundali';
+import KundaliPreview from '../screens/KundaliPreview';
+import Astology from '../screens/Astology';
 
 const Stack = createNativeStackNavigator();
 
@@ -54,6 +57,9 @@ const RootNavigator = () => {
           <Stack.Screen name="BookPooja" component={BookPooja} />
           <Stack.Screen name="MyBookings" component={MyBookings} />
           <Stack.Screen name="EditPooja" component={EditPooja} />
+          <Stack.Screen name="Kundali" component={Kundali} />
+          <Stack.Screen name="KundaliPreview" component={KundaliPreview} />
+          <Stack.Screen name="Astrology" component={Astology} />
         </>
       )}
     </Stack.Navigator>

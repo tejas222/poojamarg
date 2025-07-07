@@ -17,14 +17,71 @@ import {
 import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 
+const PoojaBookingCard = ({ booking }) => {
+  return (
+    <>
+      <Text style={styles.subtitle}>Booking Details</Text>
+      <Text style={styles.title}>
+        Pooja Name:
+        <Text style={styles.text}>{selectedBooking.poojaName}</Text>
+      </Text>
+      <Text style={styles.title}>
+        Pooja Date:
+        <Text style={styles.text}>{selectedBooking.poojaDate}</Text>
+      </Text>
+    </>
+  );
+};
+const MuhurtBookingCard = ({ booking }) => {
+  return (
+    <>
+      <Text style={styles.subtitle}>Booking Details</Text>
+      <Text style={styles.text}>
+        <Text style={styles.title}>{booking.muhurtName} </Text> या पूजेसाठी
+        <Text style={styles.title}> {booking.month}</Text> या महिन्यातील मुहूर्त
+        पाहायचा आहे.
+      </Text>
+    </>
+  );
+};
+const KundaliBookingCard = ({ booking }) => {
+  console.log('selectedBooking muurt', booking);
+
+  return (
+    <>
+      <Text style={styles.subtitle}>Booking Details</Text>
+      <Text style={styles.title}>
+        Name:
+        <Text style={styles.text}> {booking.name}</Text>
+      </Text>
+      <Text style={styles.title}>
+        Birth Date:
+        <Text style={styles.text}> {booking.birthDate}</Text>
+      </Text>
+      <Text style={styles.title}>
+        Birth Time:
+        <Text style={styles.text}> {booking.birthTime}</Text>
+      </Text>
+      <Text style={styles.title}>
+        Birth Place:
+        <Text style={styles.text}> {booking.birthPlace}</Text>
+      </Text>
+      {booking.question && (
+        <Text style={styles.title}>
+          Question:
+          <Text style={styles.text}> {booking.question}</Text>
+        </Text>
+      )}
+    </>
+  );
+};
+
 const SingleBooking = ({ route }) => {
   const navigation = useNavigation();
-  const { selectedBooking } = route.params;
+  const { selectedBooking, bookingType } = route.params;
   const [reply, setReply] = useState('');
   const [uploading, setUploading] = useState(false);
 
-  console.log('updatedDetails', selectedBooking);
-  console.log('isReply', selectedBooking.reply);
   useLayoutEffect(() => {
     navigation.setOptions({
       title: selectedBooking.poojaName,
@@ -63,50 +120,40 @@ const SingleBooking = ({ route }) => {
       <View style={styles.contentWrapper}>
         <Text style={styles.subtitle}>Customer Details</Text>
         <Text style={styles.title}>
-          Name: <Text style={styles.text}>{selectedBooking.customerName}</Text>
+          Name:
+          <Text style={styles.text}>
+            {selectedBooking.customerName || selectedBooking.name}
+          </Text>
         </Text>
         <Text style={styles.title}>
           Phone:
-          <Text style={styles.text}>{selectedBooking.customerPhone}</Text>
+          <Text style={styles.text}> {selectedBooking.customerPhone}</Text>
         </Text>
         {selectedBooking.customerEmail && (
           <Text style={styles.title}>
             Email:
-            <Text style={styles.text}>{selectedBooking.customerEmail}</Text>
+            <Text style={styles.text}> {selectedBooking.customerEmail}</Text>
           </Text>
         )}
         {selectedBooking.customerAddress && (
           <Text style={styles.title}>
             Address:
-            <Text style={styles.text}>{selectedBooking.customerAddress}</Text>
+            <Text style={styles.text}> {selectedBooking.customerAddress}</Text>
           </Text>
         )}
       </View>
       <View style={styles.contentWrapper}>
-        <Text style={styles.subtitle}>Booking Details</Text>
-        {selectedBooking.poojaName ? (
-          <>
-            <Text style={styles.title}>
-              Pooja Name:
-              <Text style={styles.text}>{selectedBooking.poojaName}</Text>
-            </Text>
-            <Text style={styles.title}>
-              Pooja Date:
-              <Text style={styles.text}>{selectedBooking.poojaDate}</Text>
-            </Text>
-          </>
-        ) : (
-          <>
-            <Text style={styles.text}>
-              <Text style={styles.title}>{selectedBooking.muhurtName} </Text> या
-              पूजेसाठी
-              <Text style={styles.title}> {selectedBooking.month}</Text> या
-              महिन्यातील मुहूर्त पाहायचा आहे.
-            </Text>
-          </>
+        {bookingType === 'pooja' && (
+          <PoojaBookingCard booking={selectedBooking} />
+        )}
+        {bookingType === 'muhurt' && (
+          <MuhurtBookingCard booking={selectedBooking} />
+        )}
+        {bookingType === 'kundali' && (
+          <KundaliBookingCard booking={selectedBooking} />
         )}
       </View>
-      {selectedBooking.muhurtName && (
+      {bookingType === 'muhurt' && (
         <>
           <Text style={styles.heading}>Post reply </Text>
           <TextInput

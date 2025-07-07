@@ -1,4 +1,11 @@
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  KeyboardAvoidingView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useUser } from '../context/UserContext';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -75,57 +82,63 @@ const BookPooja = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Book Your Pooja</Text>
-      <Text style={styles.title}>Select Pooja Name</Text>
-      <DropDownPicker
-        open={open}
-        value={selectedPooja}
-        items={items}
-        setOpen={setOpen}
-        setValue={setSelectedPooja}
-        setItems={setItems}
-        placeholder="Select a Pooja"
-        zIndex={1000}
-        zIndexInverse={3000}
-        style={{ marginBottom: open ? 50 : 20 }}
-      />
-      <Text style={styles.title}>Select Date</Text>
-      <Calendar
-        onDayPress={day => {
-          formatAndSetDate(day.dateString); // Use the new formatting function
-        }}
-        minDate={todayString}
-        markedDates={{
-          [selectedDateRaw]: {
-            // Use the raw date for marking
-            selected: true,
-            marked: true,
-            selectedColor: 'orange',
-          },
-        }}
-        style={styles.calendar}
-        theme={{
-          backgroundColor: '#ffffff',
-          calendarBackground: '#ffffff',
-          textSectionTitleColor: '#b6c1cd',
-          selectedDayBackgroundColor: '#00adf5',
-          selectedDayTextColor: '#ffffff',
-          todayTextColor: accent2,
-          dayTextColor: '#2d4150',
-          textDisabledColor: '#dd99ee',
-        }}
-      />
-      {selectedDateFormatted ? (
-        <Text style={styles.selectedDateDisplay}>
-          Selected Date: {selectedDateFormatted}
-        </Text>
-      ) : null}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'} // or 'position'
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={80} // Adjust if header/nav overlaps
+    >
+      <View style={styles.container}>
+        <Text style={styles.heading}>Book Your Pooja</Text>
+        <Text style={styles.title}>Select Pooja Name</Text>
+        <DropDownPicker
+          open={open}
+          value={selectedPooja}
+          items={items}
+          setOpen={setOpen}
+          setValue={setSelectedPooja}
+          setItems={setItems}
+          placeholder="Select a Pooja"
+          zIndex={1000}
+          zIndexInverse={3000}
+          style={{ marginBottom: open ? 50 : 20 }}
+        />
+        <Text style={styles.title}>Select Date</Text>
+        <Calendar
+          onDayPress={day => {
+            formatAndSetDate(day.dateString); // Use the new formatting function
+          }}
+          minDate={todayString}
+          markedDates={{
+            [selectedDateRaw]: {
+              // Use the raw date for marking
+              selected: true,
+              marked: true,
+              selectedColor: 'orange',
+            },
+          }}
+          style={styles.calendar}
+          theme={{
+            backgroundColor: '#ffffff',
+            calendarBackground: '#ffffff',
+            textSectionTitleColor: '#b6c1cd',
+            selectedDayBackgroundColor: '#00adf5',
+            selectedDayTextColor: '#ffffff',
+            todayTextColor: accent2,
+            dayTextColor: '#2d4150',
+            textDisabledColor: '#dd99ee',
+          }}
+        />
+        {selectedDateFormatted ? (
+          <Text style={styles.selectedDateDisplay}>
+            Selected Date: {selectedDateFormatted}
+          </Text>
+        ) : null}
 
-      <TouchableOpacity onPress={handleSubmit} style={styles.button}>
-        <Text style={styles.buttonText}>Continue</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity onPress={handleSubmit} style={styles.button}>
+          <Text style={styles.buttonText}>Continue</Text>
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 

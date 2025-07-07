@@ -25,7 +25,7 @@ const CheckoutButton = ({ updatedDetails, onPaymentSuccess }) => {
   // Destructure with default values to prevent errors if props are missing
   const {
     user = {}, // Provide a default empty object for user
-    muhurtPrice,
+    price,
     name,
     pooja = {}, // Provide a default empty object for pooja
     phone,
@@ -70,13 +70,14 @@ const CheckoutButton = ({ updatedDetails, onPaymentSuccess }) => {
       );
       const res = await functions().httpsCallable('createCashfreeOrder')({
         orderId,
-        orderAmount: muhurtPrice ? muhurtPrice : pooja.price,
+        orderAmount: price ? price : pooja.price,
         customerId: currentUser.uid,
         customerName: name ? name : user.name,
-        customerEmail: email ? email : 'test@test.com', // Provide a fallback if user.email is not set
+        customerEmail: email ? email : 'test@test.com',
         customerPhone: phone ? phone : user.phoneNumber,
       });
 
+      console.log('res.data', res.data);
       const { payment_session_id, order_id } = res.data;
 
       if (!payment_session_id || !order_id) {
@@ -144,7 +145,7 @@ const CheckoutButton = ({ updatedDetails, onPaymentSuccess }) => {
             ? 'Loading...'
             : isProcessingPayment
             ? 'Processing Payment...'
-            : 'Pay Now'}
+            : `₹ ${price ? price : pooja.price} Pay Now`}
         </Text>
       </TouchableOpacity>
     </View>

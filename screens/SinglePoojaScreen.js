@@ -48,12 +48,12 @@ const SinglePoojaScreen = ({ route, navigation }) => {
             <Text style={styles.subHeading}>{pooja.description}</Text>
 
             <Text style={{ marginTop: 20, color: 'red' }}>
-              टीप: ही शांती योग्य तिथी, मुहूर्त व पंडितांच्या मार्गदर्शनानेच
-              करावी.
+              टीप: हा विधी योग्य तिथी, मुहूर्त व गुरुजींच्या मार्गदर्शनानेच
+              करावा.
             </Text>
           </View>
           <View style={styles.priceContainer}>
-            <Text style={styles.price}>{pooja.price}</Text>
+            <Text style={styles.price}>₹ {pooja.price}</Text>
           </View>
         </View>
       </ScrollView>
@@ -111,8 +111,8 @@ const styles = StyleSheet.create({
     borderBottomColor: '#f2f2f2',
   },
   subHeading: {
-    fontSize: 20,
-    fontWeight: 700,
+    fontSize: 19,
+    fontWeight: 400,
     textAlign: 'left',
     marginTop: 20,
   },

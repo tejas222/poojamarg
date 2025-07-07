@@ -11,18 +11,6 @@ import { background, primary, secondary, success } from '../utils/constants';
 import { createOrder, startCashfreePayment } from '../services/cashfreeService';
 import { useNavigation } from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
-import functions from '@react-native-firebase/functions';
-import {
-  CFCallback,
-  CFErrorResponse,
-  CFPaymentGatewayService,
-} from 'react-native-cashfree-pg-sdk';
-import {
-  CFDropCheckoutPayment,
-  CFEnvironment,
-  CFSession,
-  CFThemeBuilder,
-} from 'cashfree-pg-api-contract';
 import firestore from '@react-native-firebase/firestore';
 import CheckoutButton from '../components/CheckoutButton';
 
@@ -108,10 +96,10 @@ const CheckoutScreen = ({ route }) => {
         </Text>
       </View>
       <View style={styles.poojaDetails}>
-        <Text style={styles.subHeading}>Included in package</Text>
-        <Text style={styles.label}>Dakshina </Text>
-        <Text style={styles.label}>Pooja Samagri </Text>
-        <Text style={styles.label}>Fruits and Flowers </Text>
+        <Text style={styles.subHeading}>पॅकेजमध्ये समाविष्ट </Text>
+        <Text style={styles.label}>दक्षिणा </Text>
+        <Text style={styles.label}>पूजा साहित्य </Text>
+        <Text style={styles.label}>फळे आणि फुले </Text>
       </View>
       <View style={styles.priceDetails}>
         <Text style={styles.subHeading}>Total:</Text>

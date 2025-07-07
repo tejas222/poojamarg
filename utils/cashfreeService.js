@@ -14,8 +14,6 @@ export const initiateCashfreePayment = async (
   onError, // The contextual onError callback from CheckoutButton
 ) => {
   try {
-    // IMPORTANT: Set the callback just before initiating the payment.
-    // This ensures the correct, current handlers are active for this specific payment.
     CFPaymentGatewayService.setCallback({
       onVerify: async verifiedOrderId => {
         console.log(
@@ -47,10 +45,6 @@ export const initiateCashfreePayment = async (
 
     const dropPayment = new CFDropCheckoutPayment(session, null, theme);
 
-    console.log(
-      'Cashfree SDK: Calling doPayment with session:',
-      session.orderId,
-    );
     CFPaymentGatewayService.doPayment(dropPayment);
   } catch (error) {
     console.error('Cashfree SDK initiation error (before doPayment):', error);

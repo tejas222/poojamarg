@@ -14,14 +14,20 @@ import { useUser } from '../context/UserContext';
 const Services = () => {
   const navigation = useNavigation();
   const { categories, loadingCategories, refreshCategories } = useUser();
-
+  console.log('categories', categories);
   useEffect(() => {
     refreshCategories();
   }, []);
 
+  const handleNavigation = item => {
+    item.title == 'कुंडली'
+      ? navigation.navigate('Astrology')
+      : navigation.navigate('Category', { category: item });
+  };
+
   const renderItem = ({ item }) => (
     <TouchableOpacity
-      onPress={() => navigation.navigate('Category', { category: item })}
+      onPress={() => handleNavigation(item)}
       style={styles.tileContainer}
     >
       <Image source={{ uri: item.imageUrl }} style={styles.icon} />

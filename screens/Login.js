@@ -85,17 +85,14 @@ const Login = ({ navigation }) => {
       Alert.alert('Error', 'Please enter a valid phone number.');
       return;
     }
-    if (!phoneNumber.startsWith('+')) {
-      Alert.alert('Error', 'Please include country code (e.g., +91).');
-      return;
-    }
 
     setLoading(true);
     try {
+      const updatedPhoneNumber = `+91${phoneNumber}`;
       // Use signInWithPhoneNumber from @react-native-firebase/auth
       const confirmation = await signInWithPhoneNumber(
         authInstance,
-        phoneNumber,
+        updatedPhoneNumber,
       );
       setConfirm(confirmation);
       Alert.alert('OTP Sent', 'Check your SMS inbox for the 6-digit code.');
@@ -129,20 +126,6 @@ const Login = ({ navigation }) => {
       // Use confirm.confirm() on the confirmation object
       const userCredential = await confirm.confirm(code);
       const user = userCredential.user;
-
-      // The onAuthStateChanged listener will now handle navigating and setting user context
-      // You can remove the direct call to handleUserLoginSuccess here if you rely purely on the listener
-      // However, if there are issues with listener timing or direct navigation is preferred,
-      // keeping it here also works, but ensure `setLoading(false)` is only called once.
-      // For a clear flow, I've moved the user data fetch and navigation into handleUserLoginSuccess
-      // which is called by the `onAuthStateChanged` listener.
-      // This ensures a consistent flow regardless of auto-verification or manual OTP entry.
-
-      console.log(
-        'OTP confirmed successfully, waiting for auth state listener.',
-      );
-      // The `onAuthStateChanged` listener will trigger and call `handleUserLoginSuccess(user)`
-      // setLoading(false) is handled in handleUserLoginSuccess
     } catch (error) {
       console.error('Error during OTP confirmation:', error);
       let errorMessage = 'Please enter the correct OTP.';
